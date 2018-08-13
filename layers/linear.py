@@ -6,11 +6,11 @@ from .layer import Layer
 class Linear(Layer):
     
     def __init__(self, input_size, output_size):
-        epsilon = 10e-3
+        epsilon = np.sqrt(2/input_size)
         # initialize the weights matrices with random values
         self.w = np.random.randn(output_size, input_size)*epsilon
-        # initialize the bias matrices with random values
-        self.b = np.random.randn(output_size, 1)*epsilon
+        # initialize the bias matrices with zero values
+        self.b = np.zeros((output_size, 1))
         
     def forward(self, x):
         # cache input data
@@ -18,7 +18,7 @@ class Linear(Layer):
         y = np.dot(self.w, x) + self.b
         
         return y
-    
+
     def backward(self, dy, alpha):        
         m = dy.shape[1]
         # back-propagation

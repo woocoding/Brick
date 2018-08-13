@@ -54,7 +54,7 @@ class Layer(object):
             raise ValueError("Learning rate (alpha) is None")
         # backward propagation
         self.backward(dyhat, alpha)
-        return loss
+        return yhat, loss 
 
     def __setattr__(self, name, value):
 
