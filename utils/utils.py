@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def fit(model, examples, labels, nums_epochs, learning_rate=None, print_info=True):
+def fit(model, examples, labels, nums_epochs, learning_rate=1e-3, print_info=True):
 
     losses = []
     for epoch in np.arange(nums_epochs):

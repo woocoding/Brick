@@ -51,7 +51,7 @@ class Layer(object):
         loss, dyhat = self.criterion(yhat, y)
         alpha = kw.get("alpha")
         if alpha == None:
-            alpha = 1e-3
+            raise ValueError("Learning rate (alpha) is None")
         # backward propagation
         self.backward(dyhat, alpha)
         return loss
