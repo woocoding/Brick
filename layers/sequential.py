@@ -16,6 +16,6 @@ class Sequantial(Layer):
     
     def add_layer(self, name, value):
         if name in self._layers:
-            warnings.warn(f"Layer:{name} will be replaced")
+            warnings.warn(f"Layer: {name} will be replaced")
         if isinstance(value, Layer):
             self._layers[name] = value
