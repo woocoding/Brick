@@ -6,7 +6,7 @@ from .layer import Layer
 class Linear(Layer):
 
     def __init__(self, input_size, output_size):
-        epsilon = 10e-3
+        epsilon = np.sqrt(1/input_size)
         # initialize the weights matrices with random values
         self.w = np.random.randn(output_size, input_size)*epsilon
         # initialize the bias matrices with zero values

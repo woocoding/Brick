@@ -16,10 +16,10 @@ class Layer(object):
         instance.__dict__["_criterion"] = None
         return instance
 
-    def forward(self, x):
+    def forward(self, x, **kw):
 
         for name in self._layers.keys():
-            x = self._layers[name].forward(x)
+            x = self._layers[name].forward(x, **kw)
         return x
 
     def backward(self, dy, **kw):
@@ -46,7 +46,7 @@ class Layer(object):
         else:
             raise ValueError("Must assign a LossFunc instance to criterion")
 
-    def optimize(self, x, y, *args, **kw):
+    def optimize(self, x, y, **kw):
         # forward propagation
         yhat = self.forward(x)
         loss, dyhat = self.criterion(yhat, y)
