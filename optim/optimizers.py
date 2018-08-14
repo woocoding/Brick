@@ -32,6 +32,7 @@ class Momentum(Optimizer):
         self.v_db = self.beta * self.v_db + (1 - self.beta)*db
 
     def update_grad(self, dw, db):
+        self.calc_past(dw, db)
         return self.v_dw.copy(), self.v_db.copy()
 
 
