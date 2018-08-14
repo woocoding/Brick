@@ -2,11 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def fit(model, examples, labels, nums_epochs, learning_rate=1e-3, print_info=True):
+def fit(model, examples, labels, nums_epochs, learning_rate=1e-3, print_info=True, **kw):
 
     losses = []
     for epoch in np.arange(nums_epochs):
-        loss = model.optimize(examples, labels, alpha=learning_rate)
+        yhat, loss = model.optimize(examples, labels, alpha=learning_rate, **kw)
         losses.append(loss)
         if print_info and (epoch + 1) % (nums_epochs//10 if nums_epochs>=10 else nums_epochs) == 0:
             print(f"Epoch[{epoch + 1}/{nums_epochs}], Loss: {loss:.{4}}")

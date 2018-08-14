@@ -3,6 +3,7 @@ from collections import OrderedDict
 import numpy as np
 
 from ..loss import LossFunc
+from .misc import regulization
 
 
 class Layer(object):
@@ -21,12 +22,12 @@ class Layer(object):
             x = self._layers[name].forward(x)
         return x
 
-    def backward(self, dy, alpha):
+    def backward(self, dy, **kw):
 
         keys = list(self._layers.keys())
         keys.reverse()
         for name in keys:
-            dy = self._layers[name].backward(dy, alpha)
+            dy = self._layers[name].backward(dy, **kw)
         return dy
 
     @property
@@ -49,12 +50,18 @@ class Layer(object):
         # forward propagation
         yhat = self.forward(x)
         loss, dyhat = self.criterion(yhat, y)
+        reg = kw.get("reg")
+        if reg != None:
+            reg_loss = regulization(reg, self._layers)
+            loss += reg_loss
+
         alpha = kw.get("alpha")
         if alpha == None:
             raise ValueError("Learning rate (alpha) is None")
         # backward propagation
-        self.backward(dyhat, alpha)
+        self.backward(dyhat, **kw)
         return yhat, loss 
+
 
     def __setattr__(self, name, value):
 

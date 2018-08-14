@@ -12,6 +12,6 @@ class ReLU(Layer):
         self.cache["y"] = np.copy(y)
         return y
 
-    def backward(self, dy, *args, **kw):
+    def backward(self, dy, **kw):
         y = self.cache["y"]
         return (y > 0)*dy
