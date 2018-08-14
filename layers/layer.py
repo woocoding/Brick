@@ -46,15 +46,12 @@ class Layer(object):
         else:
             raise ValueError("Must assign a LossFunc instance to criterion")
 
-    def update(self, x, y, **kw):
+    def update(self, x, y, alpha, **kw):
         # forward propagation
         yhat = self.forward(x)
         loss, dyhat, reg_func = self.criterion(yhat, y, self._layers)
-        alpha = kw.get("alpha")
-        if alpha == None:
-            raise ValueError("Learning rate (alpha) is None")
         # backward propagation
-        self.backward(dyhat, alpha=alpha, reg_func=reg_func)
+        self.backward(dyhat, alpha=alpha, reg_func=reg_func, **kw)
         return yhat, loss 
 
 
