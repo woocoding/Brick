@@ -25,13 +25,11 @@ class Linear(Layer):
         dx = np.dot(self.w.T, dy)
         # update w and b
         dw = 1/m*np.dot(dy, self.cache["x"].T)
-        reg = kw.get("reg")
-        lambd = kw.get("lambd")
-        if reg == "L2":
-            dw += lambd*self.w
-        elif reg == "L1":
-            dw += lambd*np.where(self.w>0, 1, -1)
-            
+        reg_func = kw.get("reg_func")
+        # if reg_fucn is not None, w is regularized
+        if reg_func:
+            dw += reg_func(self.w)
+
         db = np.mean(dy, axis=1, keepdims=True)
         self.w -= alpha*dw
         self.b -= alpha*db
