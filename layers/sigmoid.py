@@ -5,7 +5,7 @@ from .layer import Layer
 
 class Sigmoid(Layer):
 
-    def forward(self, x):
+    def forward(self, x, **kw):
         y = 1 / (1 + np.exp(-x))
         # cache g(x)
         self.cache["y"] = np.copy(y)

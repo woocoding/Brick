@@ -2,6 +2,23 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+class EWMA(object):
+    
+    def __init__(self, beta, shape):
+        self.beta = beta
+        self.e = np.zeros(shape)
+        # record the times of calculating EWMA
+        self.t = 0
+
+    def __call__(self, y, corrected=False):
+        self.e = self.beta*self.e + (1-self.beta)*y
+        self.t += 1
+        if corrected:
+            e = self.e / (1-self.beta**self.t)
+        else:
+            e = np.copy(self.e)
+        return e
+
 class Dataloader(object):
     
     def __init__(self, examples, labels, batch_size=None, shuffle=False):

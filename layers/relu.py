@@ -5,7 +5,7 @@ from .layer import Layer
 
 class ReLU(Layer):
 
-    def forward(self, x):
+    def forward(self, x, **kw):
         y = np.maximum(0,x)
         # cache g(x)
         self.cache["y"] = np.copy(y)

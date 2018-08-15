@@ -48,7 +48,7 @@ class Layer(object):
 
     def update(self, x, y, alpha, **kw):
         # forward propagation
-        yhat = self.forward(x)
+        yhat = self.forward(x, training=True)
         loss, dyhat, reg_func = self.criterion(yhat, y, self._layers)
         # backward propagation
         self.backward(dyhat, alpha=alpha, reg_func=reg_func, **kw)
@@ -64,4 +64,4 @@ class Layer(object):
 
     def __call__(self, x):
 
-        return self.forward(x)
+        return self.forward(x, training=False)

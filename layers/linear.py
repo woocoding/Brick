@@ -12,7 +12,7 @@ class Linear(Layer):
         # initialize the bias matrices with zero values
         self.b = np.zeros((output_size, 1))
 
-    def forward(self, x):
+    def forward(self, x, **kw):
         # cache input data
         self.cache["x"] = np.copy(x)
         y = np.dot(self.w, x) + self.b

@@ -5,7 +5,7 @@ from .layer import Layer
 
 class Tanh(Layer):
 
-    def forward(self, x):
+    def forward(self, x, **kw):
         y = np.tanh(x)
         # cache g(x)
         self.cache["y"] = np.copy(y)

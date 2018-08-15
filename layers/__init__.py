@@ -5,4 +5,5 @@ from .sequential import Sequantial
 from .tanh import Tanh
 from .relu import ReLU
 from .dropout import Dropout
+from .batchnorm import BatchNorm
 
