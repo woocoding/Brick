@@ -1,6 +1,23 @@
 import numpy as np
 
 
+class EWMA(object):
+    
+    def __init__(self, beta, shape):
+        self.beta = beta
+        self.e = np.zeros(shape)
+        # record the times of calculating EWMA
+        self.t = 0
+
+    def __call__(self, y, corrected=False):
+        self.e = self.beta*self.e + (1-self.beta)*y
+        self.t += 1
+        if corrected:
+            e = self.e / (1-self.beta**self.t)
+        else:
+            e = np.copy(self.e)
+        return e
+
 class Optimizer(object):
 
     def bind_new_instance(self, shape):
@@ -23,17 +40,14 @@ class Momentum(Optimizer):
         shape is tuple 
         """
         isinstance = Momentum(self.beta)
-        isinstance.v_dw = np.zeros(dw_shape)
-        isinstance.v_db = np.zeros(db_shape)
+        isinstance.ewma_dw = EWMA(self.beta, dw_shape)
+        isinstance.ewma_db = EWMA(self.beta, db_shape)
         return isinstance
 
-    def calc_past(self, dw, db):
-        self.v_dw = self.beta * self.v_dw + (1 - self.beta)*dw
-        self.v_db = self.beta * self.v_db + (1 - self.beta)*db
-
     def update_grad(self, dw, db):
-        self.calc_past(dw, db)
-        return self.v_dw.copy(), self.v_db.copy()
+        v_dw = self.ewma_dw(dw)
+        v_db = self.ewma_db(db)
+        return v_dw, v_db
 
 
 class RMSprob(Optimizer):
@@ -46,18 +60,16 @@ class RMSprob(Optimizer):
         shape is tuple 
         """
         isinstance = RMSprob(self.beta)
-        isinstance.s_dw = np.zeros(dw_shape)
-        isinstance.s_db = np.zeros(db_shape)
+        isinstance.ewma_dw2 = EWMA(self.beta, dw_shape)
+        isinstance.ewma_db2 = EWMA(self.beta, db_shape)
         return isinstance
 
-    def calc_past(self, dw, db):
-        self.s_dw = self.beta * self.s_dw + (1 - self.beta)*np.square(dw)
-        self.s_db = self.beta * self.s_db + (1 - self.beta)*np.square(db)
-
     def update_grad(self, dw, db):
-        self.calc_past(dw, db)
-        dw /= np.sqrt(self.s_dw) + 1e-8
-        db /= np.sqrt(self.s_db) + 1e-8
+        s_dw = self.ewma_dw2(dw**2)
+        s_db = self.ewma_db2(db**2)
+        eps = 1e-8
+        dw /= (np.sqrt(s_dw) + eps)
+        db /= (np.sqrt(s_db) + eps)
         return dw, db
 
 
@@ -71,26 +83,18 @@ class Adam(Optimizer):
         shape is tuple 
         """
         isinstance = Adam(self.betas)
-        isinstance.mom = Momentum(
-            self.betas[0]).bind_new_instance(dw_shape, db_shape)
-        isinstance.rms = RMSprob(
-            self.betas[1]).bind_new_instance(dw_shape, db_shape)
+        isinstance.ewma_dw = EWMA(self.betas[0], dw_shape)
+        isinstance.ewma_db = EWMA(self.betas[0], db_shape)
+        isinstance.ewma_dw2 = EWMA(self.betas[1], dw_shape)
+        isinstance.ewma_db2 = EWMA(self.betas[1], db_shape)
         return isinstance
 
     def update_grad(self, dw, db):
 
-        self.mom.calc_past(dw, db)
-        self.rms.calc_past(dw, db)
-        v_dw, v_db = self.mom.v_dw.copy(), self.mom.v_db.copy()
-        s_dw, s_db = self.rms.s_dw.copy(), self.rms.s_db.copy()
-        v_dw /= (1 - self.betas[0])
-        v_db /= (1 - self.betas[0])
-        s_dw /= (1 - self.betas[1])
-        s_db /= (1 - self.betas[1])
+        v_dw = self.ewma_dw(dw, corrected=True)
+        v_db = self.ewma_db(db, corrected=True)
+        s_dw = self.ewma_dw2(dw**2, corrected=True)
+        s_db = self.ewma_db2(db**2, corrected=True)
+        eps = 1e-16
 
-        assert v_dw.shape == dw.shape
-        assert v_db.shape == db.shape
-        assert s_dw.shape == dw.shape
-        assert s_db.shape == db.shape
-
-        return v_dw/(np.sqrt(s_dw) + 1e-16), v_db/(np.sqrt(s_db) + 1e-16)
+        return v_dw/(np.sqrt(s_dw) + eps), v_db/(np.sqrt(s_db) + eps)

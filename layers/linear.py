@@ -45,6 +45,8 @@ class Linear(Layer):
     def __getattr__(self, name):
 
         if name == "optimizer":
-            return lambda x, y: x, y
+            def f(x, y):
+                return x, y
+            return f
         else:
             raise AttributeError("")
