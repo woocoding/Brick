@@ -50,9 +50,9 @@ class BatchNorm(Layer):
         x = self.cache["x"]
         x_norm = self.cache["x_norm"]
         m = dy.shape[1]
-        
-        dbeta = np.sum(dy, axis=1, keepdims=True)
-        dgamma = np.sum(dy*x_norm, axis=1, keepdims=True) 
+        # dL/dyhat is multiplied by 1/m 
+        dbeta = np.mean(dy, axis=1, keepdims=True)
+        dgamma = np.mean(dy*x_norm, axis=1, keepdims=True) 
         dx_norm = dy*self.gamma
         dx_self = dx_norm*(1/np.sqrt(var+eps))
         dmu = np.sum(dx_norm*(-1/np.sqrt(var+eps)), axis=1, keepdims=True)

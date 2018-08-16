@@ -25,13 +25,23 @@ class LossFunc(object):
 class CrossEntropyLoss(LossFunc):
 
     def expression(self, yhat, y):
-        epsilon = 1e-256
-        loss = np.sum(y*np.log(yhat+epsilon) + (1-y)*np.log(1-yhat+epsilon), axis=0)
+        n = y.shape[0]
+        eps = 1e-256
+        if n == 1:
+            loss = y*np.log(yhat+eps) + (1-y)*np.log(1-yhat+eps)
+        else:
+            loss = np.sum(y*np.log(yhat+eps), axis=0)
         loss = -np.mean(loss)
         return np.squeeze(loss)
 
     def derivative(self, yhat, y):
-        dyhat = (yhat - y) / ((yhat*(1-yhat)) + 1e-8)
+        n = y.shape[0]
+        eps = 1e-256
+        if n == 1:
+            dyhat = (yhat - y) / ((yhat*(1-yhat)) + eps)
+        else:
+            dyhat = - y / (yhat+eps)
+        
         return dyhat
 
 
